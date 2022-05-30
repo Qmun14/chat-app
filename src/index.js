@@ -12,8 +12,21 @@ const publicDirectoryPath = path.join(__dirname, '../public')
 
 app.use(express.static(publicDirectoryPath))
 
-io.on('connection', () => {
-    console.log('New WebSocket connection');
+let count = 0
+
+// server (emit) -> client (receive) - countUpdated
+// client (emit) -> server (receive) - increment
+
+io.on('connection', (socket) => {
+    console.log('New WebSocket connection')
+
+    socket.emit('countUpdated', count)
+
+    socket.on('increment', () => {
+        count++
+        // socket.emit('countUpdated', count) --> ini gak guna karena client baru tidak realtime updated! pake yg io.emit aja
+        io.emit('countUpdated', count)
+    })
 })
 
 server.listen(port, () => {
