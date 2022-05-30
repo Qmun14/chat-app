@@ -1,10 +1,13 @@
 const socket = io()
 
-socket.on('countUpdated', (hasilCount) => {
-    console.log('The count has been updated!', hasilCount)
+socket.on('userGreetings', (hasilMessage) => {
+    console.log(hasilMessage)
 })
 
-document.querySelector('#increment').addEventListener('click', () => {
-    console.log('Clicked')
-    socket.emit('increment')
+const formChat = document.querySelector('form')
+const inputText = document.querySelector('#input')
+formChat.addEventListener('submit', (e) => {
+    e.preventDefault()
+    let messageContent = inputText.value
+    socket.emit('sendMessage', messageContent)
 })
