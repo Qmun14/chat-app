@@ -18,11 +18,15 @@ io.on('connection', (socket) => {
     console.log('New WebSocket connection')
 
     socket.emit('userGreetings', (message))
+    socket.broadcast.emit('userGreetings', 'A new User has Joined!')
 
     socket.on('sendMessage', (msgContent) => {
         io.emit('userGreetings', msgContent)
     })
- 
+
+    socket.on('disconnect', () => {
+        io.emit('userGreetings', 'A User has left!')
+    })
 })
 
 server.listen(port, () => {
