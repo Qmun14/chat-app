@@ -2,6 +2,7 @@ const path = require('path')
 const http = require('http')
 const express = require('express')
 const socketio = require('socket.io')
+const Filter = require('bad-words')
 
 const app = express()
 const server = http.createServer(app) //refactoring proses code,, tanpa ini pun express tetap membuat server nya dibelakang layar
@@ -20,16 +21,24 @@ io.on('connection', (socket) => {
     socket.emit('userGreetings', (message))
     socket.broadcast.emit('userGreetings', 'A new User has Joined!')
 
-    socket.on('sendMessage', (msgContent) => {
+    socket.on('sendMessage', (msgContent, callback) => {
+        const filter = new Filter()
+
+        if (filter.isProfane(msgContent)) {
+            return callback('Profanity is not allowed!')
+        }
+
         io.emit('userGreetings', msgContent)
+        callback()
     })
 
     socket.on('disconnect', () => {
         io.emit('userGreetings', 'A User has left!')
     })
 
-    socket.on('sendLocation', (coords) => {
+    socket.on('sendLocation', (coords, callback) => {
         io.emit('userGreetings', `https://google.com/maps?q=${coords.latitude},${coords.longitude}`)
+        callback()
     })
 })
 
