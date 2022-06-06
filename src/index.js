@@ -3,6 +3,7 @@ const http = require('http')
 const express = require('express')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
+const { generateMessage } = require('./utils/messages')
 
 const app = express()
 const server = http.createServer(app) //refactoring proses code,, tanpa ini pun express tetap membuat server nya dibelakang layar
@@ -13,13 +14,12 @@ const publicDirectoryPath = path.join(__dirname, '../public')
 
 app.use(express.static(publicDirectoryPath))
 
-let message = "Welcome..!"
 
 io.on('connection', (socket) => {
     console.log('New WebSocket connection')
 
-    socket.emit('userGreetings', (message))
-    socket.broadcast.emit('userGreetings', 'A new User has Joined!')
+    socket.emit('userGreetings', generateMessage('Welcome!'))
+    socket.broadcast.emit('userGreetings', generateMessage('A new User has Joined!'))
 
     socket.on('sendMessage', (msgContent, callback) => {
         const filter = new Filter()
@@ -28,12 +28,12 @@ io.on('connection', (socket) => {
             return callback('Profanity is not allowed!')
         }
 
-        io.emit('userGreetings', msgContent)
+        io.emit('userGreetings', generateMessage(msgContent))
         callback()
     })
 
     socket.on('disconnect', () => {
-        io.emit('userGreetings', 'A User has left!')
+        io.emit('userGreetings', generateMessage('A User has left!'))
     })
 
     socket.on('sendLocation', (coords, callback) => {
