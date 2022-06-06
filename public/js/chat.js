@@ -9,7 +9,6 @@ const $messageFormInput = $messageForm.querySelector('input')
 const $messageFormButton = $messageForm.querySelector('button')
 const $buttonLocation = document.querySelector('#send-location')
 const $messages = document.querySelector('#messages')
-const $location = document.querySelector('#url')
 
 //  Templates
 const messageTemplates = document.querySelector('#message-template').innerHTML
@@ -27,9 +26,10 @@ socket.on('userGreetings', (hasilMessage) => {
 socket.on('locationMessage', (loc) => {
     console.log(loc)
     const html = Mustache.render(locationTemplates, {
-        loc
+        loc : loc.url,
+        createdAt : moment(loc.createdAt).format('h:mm a')
     })
-    $location.insertAdjacentHTML("beforeend", html)
+    $messages.insertAdjacentHTML("beforeend", html)
 })
 
 const inputText = document.querySelector('#input')
