@@ -4,33 +4,45 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App</title>
+    <title>Chat App 1010</title>
+    <link rel="icon" href="/img/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="/css/styles.min.css">
 </head>
 <body>
-    <p>Chat App</p>
 
-    <div id="messages"></div>
-    
-    <div class="main-content">
-        <form id="message-form">
-            <input type="text" placeholder="message.." id="input">
-            <button id="send">send</button>
-        </form>
+    <div class="chat">
+        <div class="chat__sidebar">
 
-        <button id="send-location">Send location</button>
-
+        </div>
+        <div class="chat__main">
+            <div id="messages" class="chat__messages"></div>
+            <div class="compose">
+                <form id="message-form">
+                    <input type="text" placeholder="message.." id="input">
+                    <button id="send">send</button>
+                </form>   
+                <button id="send-location">Send location</button>
+            </div>
+        </div>
     </div>
-    
+   
     <script id="message-template" type="text/html">
-        <div>
-            <p>{{createdAt}} - {{hasilMessage}}</p>
+        <div class="message">
+            <p>
+                <span class="message__name">Some User name</span>
+                <span class="message__meta">{{createdAt}}</span>
+            </p>
+            <p>{{hasilMessage}}</p>
         </div>
     </script>
 
     <script id="location-template" type="text/html">
-        <div>
-            <p>{{createdAt}} - <a href="{{loc}}" target="_blank">My current location</a></p>
-            
+        <div class="message">
+            <p>
+                <span class="message__name">Some User name</span>
+                <span class="message__meta">{{createdAt}}</span>
+            </p>
+            <p><a href="{{loc}}" target="_blank">My current location</a></p>
         </div>
     </script>
 
