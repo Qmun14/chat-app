@@ -4,6 +4,7 @@ const express = require('express')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
 const { generateMessage, generateLocationMessage } = require('./utils/messages')
+const { addUser, getUser, getUsersInRoom, removeUser } = require('./utils/users')
 
 const app = express()
 const server = http.createServer(app) //refactoring proses code,, tanpa ini pun express tetap membuat server nya dibelakang layar
@@ -20,15 +21,19 @@ io.on('connection', (socket) => {
 
     
 
-    socket.on('join',  ({ username, room }) => {
-        socket.join(room)
+    socket.on('join',  (options, callback) => {
+        const { error, user} = addUser({ id : socket.id, ...options })
+
+        if (error) {
+            return callback(error)
+        }
+
+        socket.join(user.room)
 
         socket.emit('userGreetings', generateMessage('Welcome!'))
-        socket.broadcast.to(room).emit('userGreetings', generateMessage(`${username} has joined!`))
-        // console.log(room);
+        socket.broadcast.to(user.room).emit('userGreetings', generateMessage(`${user.username} has joined!`))
 
-        // socket.emit io.emit socket.broadscast.emit
-        // io.to.emit socket.broadcast.to.emit
+        callback()
     })
 
     socket.on('sendMessage', (msgContent, callback) => {
@@ -43,7 +48,12 @@ io.on('connection', (socket) => {
     })
 
     socket.on('disconnect', () => {
-        io.emit('userGreetings', generateMessage('A User has left!'))
+        const user = removeUser(socket.id)
+
+        if (user) {
+            io.to(user.room).emit('userGreetings', generateMessage(`${user.username} has left!`))
+        }
+
     })
 
     socket.on('sendLocation', (coords, callback) => {
