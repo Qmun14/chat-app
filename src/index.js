@@ -30,20 +30,21 @@ io.on('connection', (socket) => {
 
         socket.join(user.room)
 
-        socket.emit('userGreetings', generateMessage('Welcome!'))
-        socket.broadcast.to(user.room).emit('userGreetings', generateMessage(`${user.username} has joined!`))
+        socket.emit('userGreetings', generateMessage('Administrator' ,'Welcome!'))
+        socket.broadcast.to(user.room).emit('userGreetings', generateMessage('Administrator', `${user.username} has joined!`))
 
         callback()
     })
 
     socket.on('sendMessage', (msgContent, callback) => {
+        const user = getUser(socket.id)
         const filter = new Filter()
 
         if (filter.isProfane(msgContent)) {
             return callback('Profanity is not allowed!')
         }
 
-        io.emit('userGreetings', generateMessage(msgContent))
+        io.to(user.room).emit('userGreetings', generateMessage(user.username, msgContent))
         callback()
     })
 
@@ -51,13 +52,15 @@ io.on('connection', (socket) => {
         const user = removeUser(socket.id)
 
         if (user) {
-            io.to(user.room).emit('userGreetings', generateMessage(`${user.username} has left!`))
+            io.to(user.room).emit('userGreetings', generateMessage('Administrator' ,`${user.username} has left!`))
         }
 
     })
 
     socket.on('sendLocation', (coords, callback) => {
-        io.emit('locationMessage', generateLocationMessage(`https://google.com/maps?q=${coords.latitude},${coords.longitude}`))
+        const user = getUser(socket.id)
+
+        io.to(user.room).emit('locationMessage', generateLocationMessage(user.username, `https://google.com/maps?q=${coords.latitude},${coords.longitude}`))
         callback()
     })
 })
