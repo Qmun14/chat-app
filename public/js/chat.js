@@ -13,6 +13,7 @@ const $messages = document.querySelector('#messages')
 //  Templates
 const messageTemplates = document.querySelector('#message-template').innerHTML
 const locationTemplates = document.querySelector('#location-template').innerHTML
+const sidebarTemplates = document.querySelector('#sidebar-template').innerHTML
 
 // Options
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
@@ -35,6 +36,15 @@ socket.on('locationMessage', (loc) => {
         createdAt : moment(loc.createdAt).format('h:mm a')
     })
     $messages.insertAdjacentHTML("beforeend", html)
+})
+
+socket.on('roomData', ({ room, users }) => {
+    const html = Mustache.render(sidebarTemplates, {
+        room : room.toUpperCase(),
+        users
+    })
+
+    document.querySelector('#sidebar').innerHTML = html
 })
 
 const inputText = document.querySelector('#input')
@@ -71,7 +81,10 @@ $buttonLocation.addEventListener('click', () => {
 
 socket.emit('join', { username, room }, (error) => {
     if (error) {
-        alert(error)
-        location.href= '/'
+        // alert(error)
+        swal("Denied!", `${error}`, "error")
+        setTimeout(() => {
+            location.href= '/'
+        }, 2000)
     }
 })
